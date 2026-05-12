@@ -1,3 +1,6 @@
 spring:
   application:
     name: security-lab
+logging:
+  level:
+    org.springframework.security: DEBUG
