@@ -2,11 +2,15 @@ package com.securitylab.security;
 
 
 import com.securitylab.filter.MyFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSessionEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -15,7 +19,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.firewall.FirewalledRequest;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
@@ -38,22 +46,27 @@ public class DefaultSecurityConfig {
                                 sc -> sc.maximumSessions(1)
                                         .expiredUrl("/login?expired")
                         )
-                ).
-
-                authorizeHttpRequests(
+                ).httpBasic(basic -> basic.disable())
+                .formLogin(withDefaults())
+                .authorizeHttpRequests(
                         (authorize) -> authorize
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/**").hasRole("USER")
 
                 )
-                .formLogin(withDefaults()).
+                        .
 
                 build();
 
     }
 
     @Bean
-    HttpSessionEventPublisher httpSessionEventPublisher(){
+    AuthenticationManager createAuthManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();
     }
 

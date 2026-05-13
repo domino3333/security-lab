@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @Component
 @Slf4j
-@Order(3)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class MyFilter implements Filter {
 
     @Override

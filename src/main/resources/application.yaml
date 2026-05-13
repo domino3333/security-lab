@@ -3,4 +3,4 @@ spring:
     name: security-lab
 logging:
   level:
-    org.springframework.security: DEBUG
+    org.springframework.security: TRACE
